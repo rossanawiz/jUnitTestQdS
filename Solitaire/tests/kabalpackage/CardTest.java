@@ -18,12 +18,16 @@ import kabalpackage.utilities.CardImageMaker;
  * @author Luiz A Richter
  */
 public class CardTest {
-    CardImageMaker cim;
-    Card instance;
-    String fail = "\tFail executing test for ";
-    String success = "\tSuccess executing test for ";
     
-    public CardTest() {
+    CardImageMaker cim, cim2;
+    Card instance;
+    Card c;
+    BufferedImage backImage;
+    BufferedImage turnedImage;
+    BufferedImage overImage;
+    
+    @Before
+    public void setUp() {
         try{
             cim = new CardImageMaker("bondedcards.png", 79, 123);
         }catch (IOException IOe){
@@ -32,51 +36,41 @@ public class CardTest {
             fail("Could not load card images!");
         }
         
-        BufferedImage backImage = cim.cropToCard("back", 2);
-        BufferedImage turnedImage = cim.cropToCard("hearts", 2);
-        BufferedImage overImage = cim.cropToCard("hearts", 2);
+        try{
+            cim2 = new CardImageMaker("bondedcards-over.png", 79, 123);
+        }catch (IOException IOe){
+            fail("Could not load card images!");
+        }catch (IllegalArgumentException iae){
+            fail("Could not load card images!");
+        }
+        
+        this.backImage = cim.cropToCard("back", 2);
+        this.turnedImage = cim.cropToCard("hearts", 2);
+        this.overImage = cim2.cropToCard("hearts", 2);
                 
-        this.instance = new Card("spades", 3, backImage, turnedImage, overImage, 100, 100);
-    }
-    
-    @BeforeClass
-    public static void setUpClass(){
-    }
-    
-    @AfterClass
-    public static void tearDownClass(){
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
+        this.instance = new Card("hearts", 2, backImage, turnedImage, overImage, 79, 123);
     }
 
     @Test
     public void testMakeCopy(){
         System.out.println("makeCopy");
         
-        Card c = instance.makeCopy();
-        assertNotNull(instance);
-        assertNotNull(c);
+        c = instance.makeCopy();
         
-        assertEquals("Erro ao criar cópia da carta. ERRO 01", instance.type, c.type);
-        assertEquals("Erro ao criar cópia da carta. ERRO 02", instance.number, c.number);
-        assertEquals("Erro ao criar cópia da carta. ERRO 03", instance.w, c.w);
-        assertEquals("Erro ao criar cópia da carta. ERRO 04", instance.h, c.h);
-        assertEquals("Erro ao criar cópia da carta. ERRO 05", instance.IS_TURNED, c.IS_TURNED);
-        assertEquals("Erro ao criar cópia da carta. ERRO 06", instance.HIGHLIGHTED, c.HIGHLIGHTED);
+        assertNotNull("Carta criada nula", instance);
+        assertNotNull("Carta copiada nula", c);
+        
+        assertEquals("Erro ao criar cópia da carta. Tipos diferentes.", instance.type, c.type);
+        assertEquals("Erro ao criar cópia da carta. Numeros diferentes.", instance.number, c.number);
+        assertEquals("Erro ao criar cópia da carta. Larguras diferentes.", instance.w, c.w);
+        assertEquals("Erro ao criar cópia da carta. Alturas diferentes.", instance.h, c.h);
+        assertEquals("Erro ao criar cópia da carta. Status 'turned' diferentes.", instance.IS_TURNED, c.IS_TURNED);
+        assertEquals("Erro ao criar cópia da carta. Status 'highlighted' diferentes.", instance.HIGHLIGHTED, c.HIGHLIGHTED);
     }
     
     @Test
     public void testSetTurned(){
         System.out.println("setTurned");
-        
-        if(instance.IS_TURNED)
-            instance.IS_TURNED = false;
         
         instance.setTurned();
         
